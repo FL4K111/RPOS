@@ -1,0 +1,32 @@
+#include "chip.h"
+#include "types.h"
+
+#define TICK_TIMER0_CTRL_OFFSET 0x18
+#define TICK_TIMER0_CYCLE_OFFSET 0x1c
+#define TICK_TIMER1_CTRL_OFFSET 0x24
+#define TICK_TIMER1_CYCLE_OFFSET 0x28
+
+#define TICK_REG(offset) (*(volatile uint32_t *)(TICKS_BASE + offset))
+
+#define TICK_CTRL_ENABLE (0x1)
+#define TICK_CYCLE_MASK (0x1ff)
+
+#define RESET_TIMER (RESET_TIMER0 | RESET_TIMER1)
+
+
+//tick主要用于产生1us的时间基准，在rp2350中TIMER的时钟源来自tick产生的1us,而tick的时钟源是clk_ref
+//注意：在这里将TIMER0和TIMER1脱离了reset状态，所以在blink中才能直接使用
+void timer_init()
+{
+    RESET_CLR_REG |= RESET_TIMER;
+    while((RESET_DONE_REG & RESET_TIMER) != RESET_TIMER);
+
+    TICK_REG(TICK_TIMER0_CYCLE_OFFSET) &= ~TICK_CYCLE_MASK;
+    TICK_REG(TICK_TIMER0_CYCLE_OFFSET) |= 12;
+    TICK_REG(TICK_TIMER0_CTRL_OFFSET) |= TICK_CTRL_ENABLE;
+
+    TICK_REG(TICK_TIMER1_CYCLE_OFFSET) &= ~TICK_CYCLE_MASK;
+    TICK_REG(TICK_TIMER1_CYCLE_OFFSET) |= 12;
+    TICK_REG(TICK_TIMER1_CTRL_OFFSET) |= TICK_CTRL_ENABLE;
+
+}
