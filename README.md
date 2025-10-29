@@ -1,2 +1,2 @@
 ## 介绍
-本节对应[01-helloRVOS](https://github.com/plctlab/riscv-operating-system-mooc/tree/main/code/os/01-helloRVOS)，提供了rp2350上的uart驱动程序，以及一个简单的串口通信实验。
+本节对应[02-memanagement](https://github.com/plctlab/riscv-operating-system-mooc/tree/main/code/os/02-memanagement),在本节中已经实现了练习中的按字节分配。
