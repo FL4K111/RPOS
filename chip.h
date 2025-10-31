@@ -1,5 +1,5 @@
-#ifndef __CHIP_H
-#define __CHIP_H
+#ifndef __CHIP_H__
+#define __CHIP_H__
 
 
 #define ATOMIC_XOR 0x1000

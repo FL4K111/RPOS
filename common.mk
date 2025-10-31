@@ -1,5 +1,5 @@
 CROSS_COMPILE = riscv64-unknown-elf-
-CFLAGS += -nostdlib -fno-builtin -g -Wall -march=rv32imac -mabi=ilp32
+CFLAGS += -nostdlib -fno-builtin -g -Wall -march=rv32imac_zicsr -mabi=ilp32
 LFLAGS += -T mem.ld
 
 CC = ${CROSS_COMPILE}gcc
@@ -44,7 +44,7 @@ clean :
 run : all
 	${OPENOCD} -f interface/cmsis-dap.cfg -f target/rp2350-riscv.cfg \
 			   -c "adapter speed 4000" \
-			   -c "program ${ELF} reset exit"	
+			   -c "program ${ELF} reset"	
 
 .PHONY : analyze
 analyze : 
