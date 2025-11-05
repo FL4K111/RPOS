@@ -1,4 +1,4 @@
-CROSS_COMPILE = riscv64-unknown-elf-
+CROSS_COMPILE = riscv64-elf-
 CFLAGS += -nostdlib -fno-builtin -g -Wall -march=rv32imac_zicsr -mabi=ilp32
 LFLAGS += -T mem.ld
 
@@ -53,3 +53,4 @@ analyze :
 .PHONY : show
 show : 
 	${COM}
+

@@ -7,6 +7,8 @@
 #include <stddef.h>
 #include <stdarg.h>
 
+#define STACK_SIZE 1024
+
 extern void LED_Init(void);
 extern void LED_Blink(uint32_t);
 
@@ -56,6 +58,12 @@ struct context {
 	reg_t t4;
 	reg_t t5;
 	reg_t t6;
+};
+
+struct TCB {
+	struct context env;
+	uint8_t priority;
+	void *stack_p;
 };
 
 extern void schedule(void);

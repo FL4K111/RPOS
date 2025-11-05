@@ -251,16 +251,16 @@ void page_test()
 	printf("p3 = %p\n", p3);
 }
 
-void _byte_init()					//为了方便管理字节分配必须以8字节为单位；
+void _byte_init()					//为了方便管理字节分配必须以16字节为单位；
 {
 	_bytepool_start = (ptr_t)page_alloc(BYTE_PAGE_SIZE);
 	_bytepool_end = _bytepool_start + BYTE_PAGE_SIZE * PAGE_SIZE;
-	uint32_t _num_reserved_bytes = BYTE_PAGE_SIZE * PAGE_SIZE / 8;
+	uint32_t _num_reserved_bytes = BYTE_PAGE_SIZE * PAGE_SIZE / 16;
 	_balloc_start = _bytepool_start + _num_reserved_bytes;
 	_num_bytes = _bytepool_end - _balloc_start;
 
 	uint8_t *p = (uint8_t *)_bytepool_start;
-	for(int i = 0; i < (_num_bytes / 8); i++)
+	for(int i = 0; i < _num_bytes / 16; i++)
 	{
 		*p = 0;
 		p++;
@@ -275,7 +275,7 @@ void *malloc(uint32_t size)
 	uint32_t aligned_size = 0;
 	if(size % 8)
 	{
-		aligned_size = ((size / 8) + 1) * 8;
+		aligned_size = ((size / 16) + 1) * 16;
 	}
 	else{
 		aligned_size = size;
@@ -284,13 +284,13 @@ void *malloc(uint32_t size)
 	uint8_t *p_i = (uint8_t *)_bytepool_start;
 	uint8_t *p_j = NULL;
 	uint8_t found = 0;
-	for(int i = 0; i < (_num_bytes - size) / 8; i++)
+	for(int i = 0; i < (_num_bytes - size) / 16; i++)
 	{
 		if(*p_i == 0)
 		{
 			found = 1;
 			p_j = p_i + 1;
-			for(int j = i + 1; j < i + (size) / 8; j++)
+			for(int j = i + 1; j < i + (size) / 16; j++)
 			{
 				if(*p_j != 0)
 				{
@@ -303,13 +303,13 @@ void *malloc(uint32_t size)
 			if(found)
 			{
 				p_j = p_i;
-				for(int j = 1; j < size / 8; j ++)
+				for(int j = 1; j < size / 16; j ++)
 				{
 					* p_j = 1;
 					p_j++;
 				}
 				*p_j = 2;
-				return (void *)(_balloc_start + i * 8);
+				return (void *)(_balloc_start + i * 16);
 			}
 		}
 		p_i++;
@@ -322,7 +322,7 @@ void free(void *p)
 	if(!p || (ptr_t)p > _bytepool_end)
 		return;
 	uint8_t *p_t = (uint8_t *)_bytepool_start;
-	p_t += (((ptr_t)p - _balloc_start) / 8);
+	p_t += (((ptr_t)p - _balloc_start) / 16);
 	while(*p_t != 0)
 	{
 		if(*p_t == 2)

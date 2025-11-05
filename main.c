@@ -9,7 +9,7 @@ extern void page_test(void);
 extern void byte_test(void);
 
 extern void schedule_init(void);
-
+extern void task_test(void);
 
 
 int main()
@@ -21,7 +21,8 @@ int main()
     _byte_init();
     
     schedule_init();
-    schedule();
+    task_test();
+    //schedule();
 
     while (1);
     

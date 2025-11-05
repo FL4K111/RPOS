@@ -29,7 +29,7 @@ SECTIONS
         . = ALIGN(4);
         *(.text)
     } > FLASH   
-    /*这里直接将.text段放入flash中，直接在flash中执行而不需要读入ram*/
+    /*这里直接将.ext段放入flash中，直接在flash中执行而不需要读入ram*/
 
     .rodata : {
         . = ALIGN(4);
@@ -50,7 +50,7 @@ SECTIONS
         __data_start = .;
         *(.data)
         . = ALIGN(4);
-        __data_end = .;
+        PROVIDE(__data_end = .);
     } > RAM AT> FLASH
 
     __data_load_ptr = LOADADDR(.data); /*__data_start = .这类的赋值指的是内存中的位置，且只有>ram的段有（或者只有这种段是有意义的）*/

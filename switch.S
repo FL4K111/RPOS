@@ -67,7 +67,7 @@
 	LOAD t6,  30*SIZE_REG(\base)
 .endm
 
-.section .text
+.text
 .global switch_to
 .balign 4
 switch_to:
