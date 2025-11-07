@@ -49,16 +49,16 @@ void schedule()
                 temp = i;
             i = (i + 1) % _top;
         }
-        if(tasks[temp].priority < tasks[_current].priority)
-            _current = temp;
+        _current = temp;
     }
     else
     {
+        _current = (_current + 1) % _top;
         i = (_current + 1) % _top;
         temp = _current;
         while(i != _current)
         {
-            if(tasks[i].priority <= tasks[temp].priority)
+            if(tasks[i].priority < tasks[temp].priority)
                 temp = i;
             i = (i + 1) % _top;
         }
@@ -71,6 +71,7 @@ void schedule()
     switch_to(next);
 }
 
+
 int task_create(void (*task)(void* param), void *param, uint8_t priority)
 {
     if(_top < tasks_max)
@@ -82,6 +83,7 @@ int task_create(void (*task)(void* param), void *param, uint8_t priority)
         tasks[_top].env.a0 = (reg_t) param;
         tasks[_top].priority = priority;
         _top++;
+        printf("%p\n", &p[STACK_SIZE]);
         return 0;
     }
     else{
@@ -109,9 +111,11 @@ void task_exit()
     printf("new task[1].sp = %p \n", tasks[1].env.sp);
     _top--;
     _current = -1;
+    w_mscratch(0);
+    /*注意：一定要在删除一个任务后执行w_mscratch(0)，为的是在下一次switch_to时直接恢复上下文而不用保存，
+           因为就算删除了任务，此时程序的上下文（尤其是sp）仍然是被删除任务的，直接执行switch_to,会导致
+           上下文被存入位置区域导致错误*/
     schedule();
-    //问题主要还是出在栈上，现在一个解决方案就是把栈单独提出来用指针指向该区域
-    //为了整体的方便，采用将malloc的最小分配粒度改为16字节
 }
 
 void user_task0()
@@ -161,7 +165,6 @@ void task_test()
     ((int *)args)[1] = 20;
     task_create(user_task2, args, 0);
 
-    printf("_top = %d _current = %d\n", _top, _current);
     schedule();
 }
 
