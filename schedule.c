@@ -9,15 +9,6 @@ static struct TCB tasks[tasks_max];
 static int _top;
 static int _current;
 
-static void w_mscratch(reg_t x)
-{
-    asm volatile(
-        "csrw mscratch, %0"
-        : 
-        : "r" (x)
-    );
-}
-
 void user_task0();
 void user_task1();
 

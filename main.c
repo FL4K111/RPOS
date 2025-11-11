@@ -11,6 +11,9 @@ extern void byte_test(void);
 extern void schedule_init(void);
 extern void task_test(void);
 
+extern void trap_init(void);
+extern void trap_test(void);
+
 
 int main()
 {
@@ -19,10 +22,11 @@ int main()
 
     page_init();
     _byte_init();
-    
+    trap_init();
     schedule_init();
+
+    trap_test();
     task_test();
-    //schedule();
 
     while (1);
     

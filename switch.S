@@ -67,7 +67,36 @@
 	LOAD t6,  30*SIZE_REG(\base)
 .endm
 
-.text
+
+
+#在trap_vector中必须增加对于mscratch为0的处理，因为在schedule_init后mscratch为0,会在0x00000000处写入和读取上下文从而导致系统卡死
+.text 
+.global trap_vector
+trap_vector:
+	csrrw		t6, mscratch, t6
+	beqz		t6, 1f
+
+	reg_save	t6
+
+	mv			t5, t6
+	csrr		t6, mscratch
+	STORE		t6, 30*SIZE_REG(t5)
+	j			2f
+1:
+	csrw		mscratch, t6
+2:
+	csrr		a0, mepc
+	csrr		a1, mcause
+	call		trap_handler
+
+	csrw		mepc, a0
+	
+	csrr		t6, mscratch
+	beqz		t6, 3f
+	reg_restore t6
+3:
+	mret
+
 .global switch_to
 .balign 4
 switch_to:

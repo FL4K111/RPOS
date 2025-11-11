@@ -3,6 +3,7 @@
 
 #include "chip.h"
 #include "types.h"
+#include "riscv.h"
 
 #include <stddef.h>
 #include <stdarg.h>
