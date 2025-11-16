@@ -46,6 +46,11 @@ static inline void w_mstatus(reg_t x)
 	asm volatile("csrw mstatus, %0" : : "r" (x));
 }
 
+static inline void s_mstatus(reg_t x)
+{
+	asm volatile("csrs mstatus, %0" : : "r" (x));
+}
+
 /*
  * machine exception program counter, holds the
  * instruction address to which a return from
@@ -91,6 +96,10 @@ static inline void w_mie(reg_t x)
 {
 	asm volatile("csrw mie, %0" : : "r" (x));
 }
+static inline void s_mie(reg_t x)
+{
+	asm volatile("csrs mie, %0" : : "r"(x));
+}
 
 /* Machine-mode Cause Masks */
 #define MCAUSE_MASK_INTERRUPT	(reg_t)0x80000000
@@ -100,6 +109,13 @@ static inline reg_t r_mcause()
 {
 	reg_t x;
 	asm volatile("csrr %0, mcause" : "=r" (x) );
+	return x;
+}
+
+static inline reg_t r_meinext()
+{
+	reg_t x;
+	asm volatile("csrr %0, 0xbe4" : "=r" (x));
 	return x;
 }
 

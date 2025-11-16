@@ -1,5 +1,2 @@
 ## 介绍
-本节对应[06-interrupts](https://github.com/plctlab/riscv-operating-system-mooc/tree/main/code/os/06-interrupts),在本节中主要实现基于中断的串口读写
-
-
-记得在之后通过sp寄存器获取系统栈的位置。
+本节对应[06-interrupts](https://github.com/plctlab/riscv-operating-system-mooc/tree/main/code/os/06-interrupts),在本节中主要实现基于中断的串口读写。本章最主要的是通过数据手册了解RISC-V的中断结构，以及在rp2350上为支持错个外部中断增加的Xh3irq的结构，在了解这些结构后剩下的就是编写中断的处理程序了。

@@ -25,8 +25,9 @@ int main()
     trap_init();
     schedule_init();
 
-    trap_test();
-    task_test();
+
+    //trap_test();
+    //task_test();
 
     while (1);
     
