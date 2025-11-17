@@ -2,6 +2,7 @@
 
 extern void switch_to(struct context *next);
 extern void wait_ms(uint32_t delay);
+extern void w_timer_sched(uint32_t timeslice);
 
 #define tasks_max 10
 static struct TCB tasks[tasks_max];
@@ -59,11 +60,14 @@ void schedule()
 
     //这里只是切换，主要的目的是找到一个合适的_current
     struct context *next = &(tasks[_current].env);
+    //这里需要一个设置时间片的函数
+    w_timer_sched(tasks[_current].timeslice);
+
     switch_to(next);
 }
 
 
-int task_create(void (*task)(void* param), void *param, uint8_t priority)
+int task_create(void (*task)(void* param), void *param, uint8_t priority, uint32_t timeslice)
 {
     if(_top < tasks_max)
     {
@@ -73,8 +77,8 @@ int task_create(void (*task)(void* param), void *param, uint8_t priority)
         tasks[_top].env.ra = (reg_t) task;
         tasks[_top].env.a0 = (reg_t) param;
         tasks[_top].priority = priority;
+        tasks[_top].timeslice = timeslice;
         _top++;
-        printf("%p\n", &p[STACK_SIZE]);
         return 0;
     }
     else{
@@ -115,8 +119,8 @@ void user_task0()
     while(1)
     {
         printf("Task0: Running\n");
-        wait_ms(1000);
-        schedule();
+        wait_ms(200);
+        //schedule();
     }
 }
 void user_task1()
@@ -126,9 +130,8 @@ void user_task1()
     while(i < 3)
     {
         printf("Task1: Running\n");
-        i++;
-        wait_ms(1000);
-        schedule();
+        wait_ms(200);
+        //schedule();
     }
     task_exit();
 }
@@ -143,19 +146,19 @@ void user_task2(void *param)
     {
         printf("Task2: Running\n");
         //printf("%d\t%d\n", args->a, args->b);
-        wait_ms(1000);
-        schedule();
+        wait_ms(200);
+        //schedule();
     }
 }
 void task_test()
 {
-    task_create(user_task0, NULL, 1);
-    task_create(user_task1, NULL, 0);
+    task_create(user_task0, NULL, 1, 1050000);
+    task_create(user_task1, NULL, 0, 550000);
     void *args = malloc(8);
     ((int *)args)[0] = 10;
     ((int *)args)[1] = 20;
-    task_create(user_task2, args, 0);
+    task_create(user_task2, args, 0, 1050000);
 
-    schedule();
+    //schedule();
 }
 

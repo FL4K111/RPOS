@@ -1,6 +1,6 @@
 #include "os.h"
 
-
+extern void schedule(void);
 
 #define TICK_TIMER0_CTRL_OFFSET 0x18
 #define TICK_TIMER0_CYCLE_OFFSET 0x1c
@@ -71,6 +71,13 @@ static inline void w_mtimecmp(uint64_t x)
     SIO_REG(SIO_MTIMECMPH_OFFSET) = hi;
 }
 
+void w_timer_sched(uint32_t timeslice)
+{
+    uint64_t x = r_mtime();
+    x += timeslice;
+    w_mtimecmp(x);
+}
+
 void timer_irq_init()
 {
     time_count = 0;
@@ -78,49 +85,11 @@ void timer_irq_init()
     x += 1000000;
     w_mtimecmp(x);
 
-    printf("\r00:00:00");
 
 }
 
 void timer_irq_handler()
 {
-    uint64_t x = r_mtime();
-    x += 1000000;
-    time_count++;
-
-    uint8_t second = time_count % 60;
-    uint8_t minute = (time_count / 60) % 60;
-    uint8_t hour = time_count / 3600;
-    if (hour == 24) {
-        second = 0;
-        minute = 0;
-        hour = 0;
-    }
-    uart_putc('\r');
-    uint8_t hour_l;
-    uint8_t hour_h;
-    uint8_t minute_l;
-    uint8_t minute_h;
-    uint8_t second_l;
-    uint8_t second_h;
-
-    hour_h = hour / 10;
-    hour_l = hour - hour_h * 10;
-    minute_h = minute / 10;
-    minute_l = minute - minute_h * 10;
-    second_h = second / 10;
-    second_l = second - second_h * 10;
-
-    uart_putc('\r');
-    uart_putc(hour_h + '0');
-    uart_putc(hour_l + '0');
-    uart_putc(':');
-    uart_putc(minute_h + '0');
-    uart_putc(minute_l + '0');
-    uart_putc(':');
-    uart_putc(second_h + '0');
-    uart_putc(second_l + '0');
-
-    w_mtimecmp(x);
+    schedule();
 
 }

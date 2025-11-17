@@ -81,6 +81,9 @@ trap_vector:
 	mv			t5, t6
 	csrr		t6, mscratch
 	STORE		t6, 30*SIZE_REG(t5)
+
+	csrr		a0, mepc
+	STORE		a0, 31*SIZE_REG(t5)
 	j			2f
 1:
 	csrw		mscratch, t6
@@ -97,21 +100,32 @@ trap_vector:
 3:
 	mret
 
+
+#当采用基于中断的调度时，不能在switch_to里面保存上下文，而是在trap_vector中保存
+#可以这样理解，在trap_vector中保存的是任务运行的上下文，是有效的；而在switch_to中保存的只是中断执行的上下文，是无效的。
+#有效无效也很好理解，主要就是mret是直接跳回任务的中断点而非trap_vector的某一位置，这就导致记录中断的上下文无意义甚至出错。
 .global switch_to
 .balign 4
 switch_to:
-    csrrw       t6, mscratch, t6
-    beqz        t6, 1f
 
-    reg_save    t6
-    mv          t5, t6
-    csrr        t6, mscratch
-    STORE       t6, 30*SIZE_REG(t5)
+	csrrw		t6, mscratch, t6
+	beqz		t6, 1f
 
-1:
+	csrr		t6, mscratch
     csrw        mscratch, a0
+	LOAD		a1, 31*SIZE_REG(a0)
+	csrw		mepc, a1
+
+
     mv          t6, a0
     reg_restore t6
-    ret
+	j			2f
+1:
+	csrw		mscratch, a0
+	LOAD		a1, 0(a0)
+	csrw		mepc, a1
+
+2:
+    mret
 
 .end

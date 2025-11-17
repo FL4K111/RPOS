@@ -60,11 +60,15 @@ struct context {
 	reg_t t4;
 	reg_t t5;
 	reg_t t6;
+
+
+	reg_t mepc;
 };
 
 struct TCB {
 	struct context env;
 	uint8_t priority;
+	uint32_t timeslice;
 	void *stack_p;
 };
 

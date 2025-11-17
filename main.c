@@ -27,7 +27,7 @@ int main()
 
 
     //trap_test();
-    //task_test();
+    task_test();
 
     while (1);
     
