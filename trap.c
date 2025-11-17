@@ -6,6 +6,8 @@
 extern void trap_vector(void);
 extern void uart_irq_init(void);
 extern void uart_irq_handler(void);
+extern void timer_irq_handler(void);
+extern void timer_irq_init(void);
 
 
 void enable_irq(uint32_t irq)
@@ -20,10 +22,13 @@ void interrupt_init()
     //RISC-V
     s_mstatus(MSTATUS_MIE);
     s_mie(MIE_MEIE);
+    s_mie(MIE_MTIE);    //RISCV的时钟中断只来源于platform时钟，依赖于其内部的一个计数器和比较器实现，一定会产生中断信号。
     //Hazard3
     enable_irq(UART0_IRQ);
     //uart
     uart_irq_init();
+    //timer
+    timer_irq_init();
 }
 
 void trap_init()
@@ -52,15 +57,14 @@ reg_t trap_handler(reg_t mepc, reg_t mcause)
 {
     reg_t return_epc = mepc;
     reg_t cause_code = mcause & MCAUSE_MASK_ECODE;
-    if (mcause & MCAUSE_MASK_INTERRUPT)
-    {
-        switch(cause_code)
-        {
+    if (mcause & MCAUSE_MASK_INTERRUPT) {
+        switch (cause_code) {
             case 3:
                 uart_puts("software interruption!\n");
                 break;
             case 7:
-                uart_puts("timer interruption!\n");
+                //uart_puts("timer interruption!\n");
+                timer_irq_handler();
                 break;
             case 11:
                 //uart_puts("external interruption!\n");
@@ -72,8 +76,7 @@ reg_t trap_handler(reg_t mepc, reg_t mcause)
             
         }
     }
-    else
-    {
+    else {
         printf("Sync exceptions! Code = %ld\n", cause_code);
         //panic("OOPS! What can I do!");
         return_epc += 4;
@@ -88,11 +91,6 @@ void trap_test()
     uart_puts("Yeah! I'm return back from trap!\n");
 }
 
-void trap_ttt()
-{
-    printf("get rid of trap\n");
-    return;
-}
 
 
 /*RISCV的中断系统很简单：

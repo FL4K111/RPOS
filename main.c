@@ -22,8 +22,8 @@ int main()
 
     page_init();
     _byte_init();
-    trap_init();
     schedule_init();
+    trap_init();
 
 
     //trap_test();

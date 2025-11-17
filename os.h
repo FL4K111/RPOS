@@ -9,6 +9,7 @@
 #include <stdarg.h>
 
 #define STACK_SIZE 1024
+#define true 1
 
 extern void LED_Init(void);
 extern void LED_Blink(uint32_t);
