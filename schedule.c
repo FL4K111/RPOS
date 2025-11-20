@@ -99,7 +99,8 @@ void task_exit()
     /*注意：一定要在删除一个任务后执行w_mscratch(0)，为的是在下一次switch_to时直接恢复上下文而不用保存，
            因为就算删除了任务，此时程序的上下文（尤其是sp）仍然是被删除任务的，直接执行switch_to,会导致
            上下文被存入位置区域导致错误*/
-    schedule();
+    
+    w_timer_sched(100);
 }
 
 //#define USE_LOCK
