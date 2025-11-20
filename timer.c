@@ -23,8 +23,6 @@ extern void schedule(void);
 
 #define RESET_TIMER (RESET_TIMER0 | RESET_TIMER1)
 
-static uint32_t time_count;
-
 
 //tick主要用于产生1us的时间基准，在rp2350中TIMER的时钟源来自tick产生的1us,而tick的时钟源是clk_ref
 //注意：在这里将TIMER0和TIMER1脱离了reset状态，所以在blink中才能直接使用
@@ -80,16 +78,10 @@ void w_timer_sched(uint32_t timeslice)
 
 void timer_irq_init()
 {
-    time_count = 0;
-    uint64_t x = r_mtime();
-    x += 1000000;
-    w_mtimecmp(x);
-
-
+    w_timer_sched(1000000);
 }
 
 void timer_irq_handler()
 {
     schedule();
-
 }

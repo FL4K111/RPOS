@@ -30,33 +30,22 @@ void schedule()
         return;
     }
     //寻找下标的过程才是优先级算法的主要步骤
-    if(_current == -1)
-    {
+    if(_current == -1) {
         _current = 0;
-        i = (_current + 1) % _top;
-        temp = _current;
-        while(i != _current)
-        {
-            if(tasks[i].priority < tasks[temp].priority)
-                temp = i;
-            i = (i + 1) % _top;
-        }
-        _current = temp;
     }
-    else
-    {
+    else {
         _current = (_current + 1) % _top;
-        i = (_current + 1) % _top;
-        temp = _current;
-        while(i != _current)
-        {
-            if(tasks[i].priority < tasks[temp].priority)
-                temp = i;
-            i = (i + 1) % _top;
-        }
-        _current = temp;
+  
     }
-
+    
+    i = (_current + 1) % _top;
+    temp = _current;
+    while (i != _current) {
+        if (tasks[i].priority < tasks[temp].priority)
+            temp = i;
+        i = (i + 1) % _top;
+    }
+    _current = temp;
 
     //这里只是切换，主要的目的是找到一个合适的_current
     struct context *next = &(tasks[_current].env);
@@ -69,19 +58,21 @@ void schedule()
 
 int task_create(void (*task)(void* param), void *param, uint8_t priority, uint32_t timeslice)
 {
-    if(_top < tasks_max)
-    {
+    if (_top < tasks_max) {
         uint8_t *p = (uint8_t *)malloc(STACK_SIZE);
+
         tasks[_top].stack_p = p;
         tasks[_top].env.sp = (reg_t) &p[STACK_SIZE];
         tasks[_top].env.ra = (reg_t) task;
         tasks[_top].env.a0 = (reg_t) param;
+        tasks[_top].env.mepc = (reg_t) task;
+
         tasks[_top].priority = priority;
         tasks[_top].timeslice = timeslice;
         _top++;
         return 0;
     }
-    else{
+    else {
         return -1;
     }
 }
@@ -96,21 +87,24 @@ static void *memcpy(void *dest, const void *src, unsigned long n) {
 
 void task_exit()
 {
-    printf("task[1].sp = %p\ttask[2].sp = %p\n", tasks[1].env.sp, tasks[2].env.sp);
     int i = _current;
     free(tasks[_current].stack_p);
     for( ; i < _top - 1; i++)
     {
         tasks[i] = tasks[i + 1];
     }
-    printf("new task[1].sp = %p \n", tasks[1].env.sp);
     _top--;
     _current = -1;
     w_mscratch(0);
+
     /*注意：一定要在删除一个任务后执行w_mscratch(0)，为的是在下一次switch_to时直接恢复上下文而不用保存，
            因为就算删除了任务，此时程序的上下文（尤其是sp）仍然是被删除任务的，直接执行switch_to,会导致
            上下文被存入位置区域导致错误*/
-    schedule();
+
+
+    //这里一定不要自己去调用schedule()函数，因为switch_to使用的是mret,最好的方法是触发一次时钟中断，通过时钟中断进入schedule
+    //或者也可以编写软件中断，直接在这里通过软件中断进入schedule也行。
+    w_timer_sched(100);
 }
 
 void user_task0()
@@ -127,11 +121,11 @@ void user_task1()
 {
     int i = 0;
     printf("Task1: Created!\n");
-    while(i < 3)
+    while(i < 10)
     {
         printf("Task1: Running\n");
         wait_ms(200);
-        //schedule();
+        i++;
     }
     task_exit();
 }
