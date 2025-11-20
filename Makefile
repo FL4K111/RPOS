@@ -6,7 +6,8 @@ SRC_C = main.c \
 		page.c \
 		printf.c \
 		schedule.c \
-		trap.c
+		trap.c \
+		lock.c
 
 
 SRC_S = start.S \

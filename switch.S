@@ -108,24 +108,12 @@ trap_vector:
 .balign 4
 switch_to:
 
-	csrrw		t6, mscratch, t6
-	beqz		t6, 1f
-
-	csrr		t6, mscratch
-    csrw        mscratch, a0
+	csrw		mscratch, a0
 	LOAD		a1, 31*SIZE_REG(a0)
 	csrw		mepc, a1
 
-
-    mv          t6, a0
+	mv          t6, a0
     reg_restore t6
-	j			2f
-1:
-	csrw		mscratch, a0
-	LOAD		a1, 0(a0)
-	csrw		mepc, a1
-
-2:
     mret
 
 .end

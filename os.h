@@ -74,5 +74,8 @@ struct TCB {
 
 extern void schedule(void);
 
+extern int spin_lock();
+extern int spin_unlock();
+
 
 #endif

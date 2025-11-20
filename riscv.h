@@ -51,6 +51,11 @@ static inline void s_mstatus(reg_t x)
 	asm volatile("csrs mstatus, %0" : : "r" (x));
 }
 
+static inline void c_mstatus(reg_t x)
+{
+	asm volatile("csrc mstatus, %0" : : "r"(x));
+}
+
 /*
  * machine exception program counter, holds the
  * instruction address to which a return from

@@ -30,34 +30,22 @@ void schedule()
         return;
     }
     //寻找下标的过程才是优先级算法的主要步骤
-    if(_current == -1)
-    {
+    if (_current == -1) {
         _current = 0;
-        i = (_current + 1) % _top;
-        temp = _current;
-        while(i != _current)
-        {
-            if(tasks[i].priority < tasks[temp].priority)
-                temp = i;
-            i = (i + 1) % _top;
-        }
-        _current = temp;
     }
-    else
-    {
+    else {
         _current = (_current + 1) % _top;
-        i = (_current + 1) % _top;
-        temp = _current;
-        while(i != _current)
-        {
-            if(tasks[i].priority < tasks[temp].priority)
-                temp = i;
-            i = (i + 1) % _top;
-        }
-        _current = temp;
     }
 
-
+    i = (_current + 1) % _top;
+    temp = _current;
+    while (i != _current) {
+        if (tasks[i].priority < tasks[temp].priority) {
+            temp = i;
+        }
+        i = (i + 1) % _top;
+    }
+    _current = temp;
     //这里只是切换，主要的目的是找到一个合适的_current
     struct context *next = &(tasks[_current].env);
     //这里需要一个设置时间片的函数
@@ -73,9 +61,12 @@ int task_create(void (*task)(void* param), void *param, uint8_t priority, uint32
     {
         uint8_t *p = (uint8_t *)malloc(STACK_SIZE);
         tasks[_top].stack_p = p;
+
         tasks[_top].env.sp = (reg_t) &p[STACK_SIZE];
         tasks[_top].env.ra = (reg_t) task;
         tasks[_top].env.a0 = (reg_t) param;
+        tasks[_top].env.mepc = (reg_t)task;
+
         tasks[_top].priority = priority;
         tasks[_top].timeslice = timeslice;
         _top++;
@@ -96,14 +87,12 @@ static void *memcpy(void *dest, const void *src, unsigned long n) {
 
 void task_exit()
 {
-    printf("task[1].sp = %p\ttask[2].sp = %p\n", tasks[1].env.sp, tasks[2].env.sp);
     int i = _current;
     free(tasks[_current].stack_p);
     for( ; i < _top - 1; i++)
     {
         tasks[i] = tasks[i + 1];
     }
-    printf("new task[1].sp = %p \n", tasks[1].env.sp);
     _top--;
     _current = -1;
     w_mscratch(0);
@@ -112,6 +101,8 @@ void task_exit()
            上下文被存入位置区域导致错误*/
     schedule();
 }
+
+//#define USE_LOCK
 
 void user_task0()
 {
@@ -125,15 +116,20 @@ void user_task0()
 }
 void user_task1()
 {
-    int i = 0;
-    printf("Task1: Created!\n");
-    while(i < 3)
-    {
-        printf("Task1: Running\n");
-        wait_ms(200);
-        //schedule();
+    uart_puts("Task1: Created!\n");
+
+    while(1) {
+        #ifdef USE_LOCK
+        spin_lock();
+        #endif
+        for (int i = 0; i < 10; i++) {
+            uart_puts("Task1: Running!\n");
+            wait_ms(200);
+        }
+        #ifdef USE_LOCK
+        spin_unlock();
+        #endif
     }
-    task_exit();
 }
 void user_task2(void *param)
 {
@@ -145,20 +141,16 @@ void user_task2(void *param)
     while(1)
     {
         printf("Task2: Running\n");
-        //printf("%d\t%d\n", args->a, args->b);
         wait_ms(200);
-        //schedule();
     }
 }
 void task_test()
 {
-    task_create(user_task0, NULL, 1, 1050000);
+    task_create(user_task0, NULL, 0, 1050000);
     task_create(user_task1, NULL, 0, 550000);
     void *args = malloc(8);
     ((int *)args)[0] = 10;
     ((int *)args)[1] = 20;
-    task_create(user_task2, args, 0, 1050000);
-
-    //schedule();
+    task_create(user_task2, args, 1, 1050000);
 }
 
