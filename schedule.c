@@ -103,7 +103,7 @@ void task_exit()
     w_timer_sched(100);
 }
 
-//#define USE_LOCK
+#define USE_LOCK
 
 void user_task0()
 {
