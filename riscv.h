@@ -126,5 +126,4 @@ static inline reg_t r_meinext()
 
 
 
-
 #endif /* __RISCV_H__ */

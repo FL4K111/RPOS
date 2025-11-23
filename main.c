@@ -14,6 +14,8 @@ extern void task_test(void);
 extern void trap_init(void);
 extern void trap_test(void);
 
+extern void wait_ms(uint32_t delay);
+
 
 int main()
 {
@@ -23,13 +25,17 @@ int main()
     page_init();
     _byte_init();
     schedule_init();
+
     trap_init();
-
-
-    //trap_test();
     task_test();
 
-    while (1);
+    while (1)
+    {
+    uint32_t p;
+    asm volatile("csrr %0, mip" : "=r" (p));
+    printf("MIP:%p\n", p);
+    wait_ms(200);
+    };
     
     return 0;
 }

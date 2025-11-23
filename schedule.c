@@ -10,6 +10,14 @@ static struct TCB tasks[tasks_max];
 static int _top;
 static int _current;
 
+struct userdata {
+	int counter;
+	char *str;
+};
+
+/* Jack must be global */
+struct userdata person;
+
 void user_task0();
 void user_task1();
 
@@ -54,6 +62,17 @@ void schedule()
     switch_to(next);
 }
 
+void timer_func(void *arg)
+{
+	if (NULL == arg)
+		return;
+
+	struct userdata *param = (struct userdata *)arg;
+	param->counter++;
+	printf("======> TIMEOUT: %s: %d\n", param->str, param->counter);
+
+    //uart_puts("hello\n");
+}
 
 int task_create(void (*task)(void* param), void *param, uint8_t priority, uint32_t timeslice)
 {
@@ -107,6 +126,20 @@ void task_exit()
 
 void user_task0()
 {
+    person.counter = 0;
+    person.str = "jack";
+    struct timer *t1 = timer_create(timer_func, &person, 3);
+	if (NULL == t1) {
+		printf("timer_create() failed!\n");
+	}
+	struct timer *t2 = timer_create(timer_func, &person, 5);
+	if (NULL == t2) {
+		printf("timer_create() failed!\n");
+	}
+	struct timer *t3 = timer_create(timer_func, &person, 7);
+	if (NULL == t3) {
+		printf("timer_create() failed!\n");
+	}
     printf("Task0: Created!\n");
     while(1)
     {

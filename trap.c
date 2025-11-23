@@ -1,6 +1,7 @@
 #include "os.h"
 
 #define UART0_IRQ 33
+#define TIMER1_IRQ_0 4
 #define IRQ_MASK (0x2fc)
 
 extern void trap_vector(void);
@@ -8,6 +9,7 @@ extern void uart_irq_init(void);
 extern void uart_irq_handler(void);
 extern void timer_irq_handler(void);
 extern void timer_irq_init(void);
+extern void timer_alarm0_irq_handler(void);
 
 
 void enable_irq(uint32_t irq)
@@ -25,6 +27,7 @@ void interrupt_init()
     s_mie(MIE_MTIE);    //RISCV的时钟中断只来源于platform时钟，依赖于其内部的一个计数器和比较器实现，一定会产生中断信号。
     //Hazard3
     enable_irq(UART0_IRQ);
+    enable_irq(TIMER1_IRQ_0);
     //uart
     uart_irq_init();
     //timer
@@ -49,9 +52,13 @@ void interrupt_handler()
         case 33:
             uart_irq_handler();
             break;
+        case 4:
+            timer_alarm0_irq_handler();
+            break;
         default:
             break;
     }
+    printf("get out \n");
 }
 
 reg_t trap_handler(reg_t mepc, reg_t mcause)
@@ -64,11 +71,11 @@ reg_t trap_handler(reg_t mepc, reg_t mcause)
                 uart_puts("software interruption!\n");
                 break;
             case 7:
-                //uart_puts("timer interruption!\n");
+                uart_puts("timer interruption!\n");
                 timer_irq_handler();
                 break;
             case 11:
-                //uart_puts("external interruption!\n");
+                uart_puts("external interruption!\n");
                 interrupt_handler();
                 break;
             default:
