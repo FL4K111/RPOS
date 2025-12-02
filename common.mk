@@ -44,6 +44,7 @@ clean :
 run : all
 	${OPENOCD} -f interface/cmsis-dap.cfg -f target/rp2350-riscv.cfg \
 			   -c "adapter speed 4000" \
+			   -c "init" \
 			   -c "program ${ELF} reset exit"	
 
 .PHONY : analyze

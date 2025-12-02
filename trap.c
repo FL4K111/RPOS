@@ -21,10 +21,6 @@ void enable_irq(uint32_t irq)
 
 void interrupt_init()
 {
-    //RISC-V
-    s_mstatus(MSTATUS_MIE);
-    s_mie(MIE_MEIE);
-    s_mie(MIE_MTIE);    //RISCV的时钟中断只来源于platform时钟，依赖于其内部的一个计数器和比较器实现，一定会产生中断信号。
     //Hazard3
     enable_irq(UART0_IRQ);
     enable_irq(TIMER1_IRQ_0);
@@ -33,6 +29,10 @@ void interrupt_init()
     //timer
     //timer_irq_init有个问题是，实际的初始化应该只是s_mie(MIE_MTIE)，而这里只是设置了一个1秒的中断，真正要用定时的时候再设置就行
     timer_irq_init();
+    //RISCV
+    s_mstatus(MSTATUS_MIE);
+    s_mie(MIE_MEIE);
+    s_mie(MIE_MTIE); 
 }
 
 void trap_init()
@@ -47,6 +47,7 @@ void interrupt_handler()
     ch = r_meinext();
     ch = ch & IRQ_MASK;
     ch = ch >> 2;
+    printf("extern interrupt:%d\n", ch);
     switch(ch)
     {
         case 33:
@@ -58,7 +59,6 @@ void interrupt_handler()
         default:
             break;
     }
-    printf("get out \n");
 }
 
 reg_t trap_handler(reg_t mepc, reg_t mcause)

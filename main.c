@@ -15,10 +15,13 @@ extern void trap_init(void);
 extern void trap_test(void);
 
 extern void wait_ms(uint32_t delay);
-
+#define MAIN_LOCK
 
 int main()
 {
+#ifdef MAIN_LOCK
+    spin_lock();
+#endif
     uart_init();
     printf("Hello RPOS!\n");
 
@@ -26,7 +29,12 @@ int main()
     _byte_init();
     schedule_init();
 
+    //task_test();
     trap_init();
+
+#ifdef MAIN_LOCK
+    spin_unlock();
+#endif
     task_test();
 
     while (1)

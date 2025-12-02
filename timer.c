@@ -58,13 +58,6 @@ void timer_init()
     TICK_REG(TICK_RISCV_CYCLE_OFFSET) &= ~TICK_CYCLE_MASK;
     TICK_REG(TICK_RISCV_CYCLE_OFFSET) |= 0xc;
     TICK_REG(TICK_RISCV_CTRL_OFFSET) |= TICK_CTRL_ENABLE;
-
-    struct timer *t = &(timer_list[0]);
-	for (int i = 0; i < MAX_TIMER; i++) {
-		t->func = NULL; /* use .func to flag if the item is used */
-		t->arg = NULL;
-		t++;
-	}
 }
 
 struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout)
@@ -178,8 +171,15 @@ void timer_irq_init()
     TIMER1_REG(TIMER_INTE_OFFSET) |= TIMER_ALARM0_MASK;
     w_timer_alarm(SWTIMER_DELAY);
 
+    struct timer *t = &(timer_list[0]);
+	for (int i = 0; i < MAX_TIMER; i++) {
+		t->func = NULL; /* use .func to flag if the item is used */
+		t->arg = NULL;
+		t++;
+	}
+
     uint64_t x = r_mtime();
-    x += 500000;
+    x += 1000000;
     w_mtimecmp(x);
 }
 
