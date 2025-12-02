@@ -29,7 +29,7 @@ void interrupt_init()
     uart_irq_init();
     //timer
     //timer_irq_init有个问题是，实际的初始化应该只是s_mie(MIE_MTIE)，而这里只是设置了一个1秒的中断，真正要用定时的时候再设置就行
-    timer_irq_init();
+    //timer_irq_init();
 }
 
 void trap_init()
@@ -64,11 +64,11 @@ reg_t trap_handler(reg_t mepc, reg_t mcause)
                 uart_puts("software interruption!\n");
                 break;
             case 7:
-                //uart_puts("timer interruption!\n");
+                uart_puts("timer interruption!\n");
                 timer_irq_handler();
                 break;
             case 11:
-                //uart_puts("external interruption!\n");
+                uart_puts("external interruption!\n");
                 interrupt_handler();
                 break;
             default:
