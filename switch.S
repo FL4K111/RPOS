@@ -84,11 +84,11 @@ trap_vector:
 
 	csrr		a0, mepc
 	STORE		a0, 31*SIZE_REG(t5)
+	csrw		mscratch, t5
 	j			2f
 1:
 	csrw		mscratch, t6
 2:
-	csrw		mscratch, t5
 	csrr		a0, mepc
 	csrr		a1, mcause
 	call		trap_handler

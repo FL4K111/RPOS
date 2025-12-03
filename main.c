@@ -15,7 +15,7 @@ extern void trap_init(void);
 extern void trap_test(void);
 
 extern void wait_ms(uint32_t delay);
-#define MAIN_LOCK
+//#define MAIN_LOCK
 
 int main()
 {

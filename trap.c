@@ -31,7 +31,7 @@ void interrupt_init()
     //timer_irq_init有个问题是，实际的初始化应该只是s_mie(MIE_MTIE)，而这里只是设置了一个1秒的中断，真正要用定时的时候再设置就行
     timer_irq_init();
     //RISCV
-    s_mstatus(MSTATUS_MIE);
+    //s_mstatus(MSTATUS_MIE);
     s_mie(MIE_MEIE);
     s_mie(MIE_MTIE); 
 }
