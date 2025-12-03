@@ -36,7 +36,7 @@ int main()
     spin_unlock();
 #endif
     task_test();
-
+    schedule();
     while (1)
     {
     uint32_t p;

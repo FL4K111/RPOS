@@ -10,6 +10,7 @@ extern void uart_irq_handler(void);
 extern void timer_irq_handler(void);
 extern void timer_irq_init(void);
 extern void timer_alarm0_irq_handler(void);
+extern void wait_ms(uint32_t);
 
 
 void enable_irq(uint32_t irq)
@@ -86,7 +87,9 @@ reg_t trap_handler(reg_t mepc, reg_t mcause)
     }
     else {
         printf("Sync exceptions! Code = %ld\n", cause_code);
+        printf("Mepc: %p\n", mepc);
         //panic("OOPS! What can I do!");
+        wait_ms(200);
         return_epc += 4;
     }
 

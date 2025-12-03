@@ -177,10 +177,6 @@ void timer_irq_init()
 		t->arg = NULL;
 		t++;
 	}
-
-    uint64_t x = r_mtime();
-    x += 1000000;
-    w_mtimecmp(x);
 }
 
 void timer_irq_handler()
@@ -191,9 +187,7 @@ void timer_alarm0_irq_handler()
 {
     _tick++;
     printf("tick: %d\n", _tick);
-
-    timer_check();
-
-    TIMER1_REG(TIMER_INTR_OFFSET) = TIMER_ALARM0_MASK;
+	TIMER1_REG(TIMER_INTR_OFFSET) = TIMER_ALARM0_MASK;
     w_timer_alarm(SWTIMER_DELAY);
+    timer_check();
 }

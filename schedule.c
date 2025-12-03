@@ -122,7 +122,6 @@ void task_exit()
     w_timer_sched(100);
 }
 
-#define USE_LOCK
 
 void user_task0()
 {
@@ -148,6 +147,8 @@ void user_task0()
         //schedule();
     }
 }
+
+//#define USE_LOCK
 void user_task1()
 {
     uart_puts("Task1: Created!\n");
