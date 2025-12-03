@@ -28,6 +28,7 @@ int main()
 
     //trap_test();
     task_test();
+    schedule();
 
     while (1);
     

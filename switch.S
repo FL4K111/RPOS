@@ -84,6 +84,7 @@ trap_vector:
 
 	csrr		a0, mepc
 	STORE		a0, 31*SIZE_REG(t5)
+	csrw		mscratch, t5
 	j			2f
 1:
 	csrw		mscratch, t6

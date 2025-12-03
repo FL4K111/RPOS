@@ -20,7 +20,7 @@ void enable_irq(uint32_t irq)
 void interrupt_init()
 {
     //RISC-V
-    s_mstatus(MSTATUS_MIE);
+    //s_mstatus(MSTATUS_MIE);
     s_mie(MIE_MEIE);
     s_mie(MIE_MTIE);    //RISCV的时钟中断只来源于platform时钟，依赖于其内部的一个计数器和比较器实现，一定会产生中断信号。
     //Hazard3
@@ -28,7 +28,7 @@ void interrupt_init()
     //uart
     uart_irq_init();
     //timer
-    timer_irq_init();
+    //timer_irq_init();
 }
 
 void trap_init()

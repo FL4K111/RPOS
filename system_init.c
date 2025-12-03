@@ -1,5 +1,6 @@
 #include "chip.h"
 #include "types.h"
+#include "riscv.h"
 
 extern void timer_init(void);
 
@@ -99,4 +100,5 @@ void system_init(void)
 {
     clk_init();
     timer_init();
+    s_mstatus(MSTATUS_MPP | MSTATUS_MPIE); 
 }
