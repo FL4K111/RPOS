@@ -96,10 +96,19 @@ void clk_init(void)
 }
 
 
+void use_U()
+{
+    w_pmpaddr0(XIP_NAPOT);
+    w_pmpaddr1(SRAM_NAPOT);
+    w_pmpcfg0(XIP_PRI | SRAM_PRI);
+}
+
 void system_init(void)
 {
     clk_init();
     timer_init();
+    use_U();
     s_mstatus(MSTATUS_MPIE);
-    s_mstatus(MSTATUS_MPP);
+    c_mstatus(MSTATUS_MPP);
 }
+

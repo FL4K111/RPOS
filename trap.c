@@ -62,7 +62,22 @@ void interrupt_handler()
     }
 }
 
-reg_t trap_handler(reg_t mepc, reg_t mcause)
+void exception_handler(struct context* context)
+{
+    uint32_t temp = context->a7;        //temp读取context中a7,即系统调用的种类
+    switch (temp) {
+        case 1:
+            uart_puts((char*)context->a0);
+            break;
+        case 2:
+            wait_ms((uint32_t)context->a0);
+            break;
+        default:
+            break;
+    }
+}
+
+reg_t trap_handler(reg_t mepc, reg_t mcause, struct context* context)
 {
     reg_t return_epc = mepc;
     reg_t cause_code = mcause & MCAUSE_MASK_ECODE;
@@ -86,11 +101,23 @@ reg_t trap_handler(reg_t mepc, reg_t mcause)
         }
     }
     else {
-        printf("Sync exceptions! Code = %ld\n", cause_code);
-        printf("Mepc: %p\n", mepc);
+            //printf("Sync exceptions! Code = %ld\n", cause_code);
+        switch(cause_code) {
+            case 8:
+                exception_handler(context);
+                return_epc += 4;
+                break;
+            case 11:
+                exception_handler(context);
+                return_epc += 4;
+                break;
+
+            default:
+                printf("Sync exceptions! Code = %ld\n", cause_code);
+                printf("MEPC = %p\n", mepc);
+                break;
+        }
         //panic("OOPS! What can I do!");
-        wait_ms(200);
-        return_epc += 4;
     }
 
     return return_epc;

@@ -124,6 +124,23 @@ static inline reg_t r_meinext()
 	return x;
 }
 
+#define XIP_NAPOT 0x047fffff
+#define XIP_PRI	0x1f
+#define SRAM_NAPOT 0x087fffff
+#define SRAM_PRI (0x1f << 8)
+
+static inline void w_pmpaddr0(uint32_t x)
+{
+	asm volatile("csrw 0x3b0, %0" : : "r"(x));
+}
+static inline void w_pmpcfg0(uint32_t x)
+{
+	asm volatile("csrw 0x3a0, %0" : : "r"(x));
+}
+static inline void w_pmpaddr1(uint32_t x)
+{
+	asm volatile("csrw 0x3b1, %0" : : "r"(x));
+}
 
 
 #endif /* __RISCV_H__ */
