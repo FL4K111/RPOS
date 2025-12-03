@@ -85,4 +85,7 @@ struct timer {
 extern struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
 extern void timer_delete(struct timer *timer);
 
+extern void uart_puts_u(char*);
+extern void wait_ms_u(uint32_t);
+
 #endif

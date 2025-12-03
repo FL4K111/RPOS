@@ -122,7 +122,30 @@ void task_exit()
     w_timer_sched(100);
 }
 
+#define USE_SYSCALL
 
+#ifdef USE_SYSCALL
+void user_task0()
+{
+    uart_puts_u("Task0: Created!\n");
+    while(1)
+    {
+        uart_puts_u("Task0: Running\n");
+        wait_ms_u(200);
+        //schedule();
+    }
+}
+void user_task1()
+{
+    uart_puts_u("Task1: Created!\n");
+
+    while(1)
+    {
+        uart_puts_u("Task1: Running\n");
+        wait_ms_u(200);
+    }
+}
+#else
 void user_task0()
 {
     person.counter = 0;
@@ -166,6 +189,7 @@ void user_task1()
         #endif
     }
 }
+#endif
 void user_task2(void *param)
 {
     struct {

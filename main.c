@@ -15,7 +15,7 @@ extern void trap_init(void);
 extern void trap_test(void);
 
 extern void wait_ms(uint32_t delay);
-#define MAIN_LOCK
+//#define MAIN_LOCK
 
 int main()
 {
@@ -37,13 +37,6 @@ int main()
 #endif
     task_test();
     schedule();
-    while (1)
-    {
-    uint32_t p;
-    asm volatile("csrr %0, mip" : "=r" (p));
-    printf("MIP:%p\n", p);
-    wait_ms(200);
-    };
     
     return 0;
 }

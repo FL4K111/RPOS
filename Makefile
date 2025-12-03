@@ -12,6 +12,7 @@ SRC_C = main.c \
 
 SRC_S = start.S \
 		mem.S \
-		switch.S 
+		switch.S \
+		syscall.S 
 
 include ./common.mk
